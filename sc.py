@@ -11,8 +11,8 @@ from selenium import webdriver
 import time
 
 if __name__ == '__main__':
-    auth=Auth('19162856317')
-    if auth.check():
+    auth=Auth()
+    if auth.check2():
         print('验证通过')
         parser = argparse.ArgumentParser(description='账户信息')
         parser.add_argument('account', type=str, help='账户')
@@ -64,7 +64,7 @@ if __name__ == '__main__':
             user.save_balance_to_file("购买后余额")
             driver.quit()
     else:
-        print('验证失败')
+        print('验证失败,请联系管理员获取授权')
 
 # if __name__ == '__main__':
 #     max_attempts = 1
