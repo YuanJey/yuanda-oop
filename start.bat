@@ -26,7 +26,8 @@ for /f "tokens=*" %%a in (%CONFIG_FILE%) do (
         set num1000=%%h
         set num2000=%%i
 
-        start "" .\dist\sc3.exe !account! !password! !date! ^
+        :: 启动 v7.exe，并传入所有参数
+        start "" "./v7.exe" "!account!" "!password!" "!date!" ^
             --num100 !num100! ^
             --num200 !num200! ^
             --num500 !num500! ^
