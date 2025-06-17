@@ -10,11 +10,8 @@ if not exist "%CONFIG_FILE%" (
 
 echo 正在启动账户...
 
-for /f "tokens=*" %%a in (%CONFIG_FILE%) do (
+for /f "tokens=*" %%a in ('findstr /v "^$" "%CONFIG_FILE%" ^| findstr /v "^#"') do (
     set "line=%%a"
-
-    echo.!line! | findstr "^#">nul && continue
-    if "!line!" == "" continue
 
     for /f "tokens=1-8" %%b in ("!line!") do (
         set account=%%b
