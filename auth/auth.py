@@ -4,6 +4,16 @@ class Auth:
     def __init__(self,key):
         self.key = key
 
+    def get_key(self):
+        with open('key.txt', 'r', encoding='utf-8') as file:
+            key = ''
+            for line in file:
+                line = line.strip()
+                if not line:
+                    continue  # 跳过空行
+                key = line
+
+        return key
     def check(self):
         """通过网络请求验证MAC地址"""
         url = 'https://test-1312265679.cos.ap-chengdu.myqcloud.com/config_check.json'
