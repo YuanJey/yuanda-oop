@@ -79,7 +79,9 @@ if __name__ == '__main__':
             for order in orders:
                 jd_map = read_file(order)
                 for jd_account, jd_password in jd_map.items():
-                    executor.submit(verification, jd_account, jd_password, cookie)
+                    # executor.submit(verification, jd_account, jd_password, cookie)
+                    for i in range(5):
+                        executor.submit(verification, jd_account, jd_password, cookie)
         cont = input("是否继续（1:再次核销，其他任意键，退出）：")
         if cont == '1':
             continue

@@ -80,13 +80,14 @@ class  User:
             print(f"登录过程发生严重错误: {e}")
             return False
 
-    def download_order(self):
+    def download_order(self,date):
         """下载文件"""
-        current_date = datetime.now()
+        # current_date = datetime.now()
         # 计算前一天的日期
-        previous_day = current_date - timedelta(days=1)
+        # previous_day = current_date - timedelta(days=1)
         # 格式化输出为字符串（格式为YYYY-MM-DD）
-        previous_day_str = previous_day.strftime("%Y-%m-%d")
+        # previous_day_str = previous_day.strftime("%Y-%m-%d")
+        previous_day_str = date
         directory = Path(previous_day_str)
         # 创建目录（包括所有必要的父目录）
         directory.mkdir(parents=True, exist_ok=True)

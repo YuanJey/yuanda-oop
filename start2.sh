@@ -10,10 +10,10 @@ if [[ -f "$CONFIG_FILE" ]]; then
         [[ "$line" =~ ^#.* || -z "$line" ]] && continue
 
         # 解析每一行
-        read -r account password num100 num200 num500 num1000 num2000 <<< "$line"
+        read -r account password date num100 num200 num500 num1000 num2000 <<< "$line"
 
         # 启动脚本
-        ./dist/sc "$account" "$password" \
+        ./dist/sc3 "$account" "$password" "$date" \
             --num100 "$num100" \
             --num200 "$num200" \
             --num500 "$num500" \

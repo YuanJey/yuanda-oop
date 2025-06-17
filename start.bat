@@ -1,31 +1,41 @@
 @echo off
-chcp 65001 >nul
-set "CONFIG_FILE=accounts.txt"
+setlocal enabledelayedexpansion
+
+set CONFIG_FILE=accounts.txt
+
 if not exist "%CONFIG_FILE%" (
     echo 配置文件 %CONFIG_FILE% 不存在！
     exit /b 1
 )
-echo 正在启动账户任务...
-for /f "usebackq tokens=*" %%a in ("%CONFIG_FILE%") do (
-    echo 正在处理: %%a
 
-    echo %%a | findstr "^#" >nul && continue
-    for /f "tokens=1-6" %%A in ("%%a") do (
-        set account=%%A
-        set password=%%B
-        set num100=%%C
-        set num200=%%D
-        set num500=%%E
-        set num1000=%%F
-        set num2000=%%G
-        echo 启动账户: %%A
-        start "" "dist\sc.exe" %%A %%B --num100 %%C --num200 %%D --num500 %%E --num1000 %%F --num2000 %%G
+echo 正在启动账户...
 
-        timeout /t 1 >nul
+for /f "tokens=*" %%a in (%CONFIG_FILE%) do (
+    set "line=%%a"
+
+    echo.!line! | findstr "^#">nul && continue
+    if "!line!" == "" continue
+
+    for /f "tokens=1-8" %%b in ("!line!") do (
+        set account=%%b
+        set password=%%c
+        set date=%%d
+        set num100=%%e
+        set num200=%%f
+        set num500=%%g
+        set num1000=%%h
+        set num2000=%%i
+
+        start "" .\dist\sc3.exe !account! !password! !date! ^
+            --num100 !num100! ^
+            --num200 !num200! ^
+            --num500 !num500! ^
+            --num1000 !num1000! ^
+            --num2000 !num2000!
+
+        echo 已启动账户: !account!
     )
 )
-echo.
-echo 所有程序已启动
-echo.
 
-exit /b 0
+echo 所有程序已启动
+endlocal
