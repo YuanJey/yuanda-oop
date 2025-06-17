@@ -6,12 +6,13 @@ class Order:
     def __init__(self):
         pass
 
-    def get_order_files(self):
-        current_date = datetime.now()
-        # 计算前一天的日期
-        previous_day = current_date - timedelta(days=1)
-        # 格式化输出为字符串（格式为YYYY-MM-DD）
-        file_path = previous_day.strftime("%Y-%m-%d")
+    def get_order_files(self,date):
+        # current_date = datetime.now()
+        # # 计算前一天的日期
+        # previous_day = current_date - timedelta(days=1)
+        # # 格式化输出为字符串（格式为YYYY-MM-DD）
+        # file_path = previous_day.strftime("%Y-%m-%d")
+        file_path = date
         if not os.path.exists(file_path) or not os.path.isdir(file_path):
             print(f"路径 {file_path} 不存在或不是文件夹")
             return []

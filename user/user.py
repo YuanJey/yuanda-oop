@@ -112,7 +112,7 @@ class  User:
         url = 'https://sc.yuanda.biz/jingdian/User/usCenter.html'
         self.driver.get(url)
         # 等待元素出现（最多等待10秒）
-        wait = WebDriverWait(self.driver, 10)
+        wait = WebDriverWait(self.driver, 60)
         balance_element = wait.until(
             EC.presence_of_element_located((By.CLASS_NAME, 'corg'))
         )
