@@ -107,7 +107,7 @@ class  User:
             print(f"下载错误: {e}")
 
     # 获取余额 <span class="corg">0.00 元</span>
-    def get_balance(self):
+    def get_balance1(self):
         """获取账户余额"""
         url = 'https://sc.yuanda.biz/jingdian/User/usCenter.html'
         self.driver.get(url)
@@ -122,6 +122,30 @@ class  User:
         balance_text = balance_text.replace(',', '')
         balance_text = float(balance_text)
         return balance_text
+
+    def get_balance(self):
+        """获取账户余额，失败时刷新页面并重试"""
+        url = 'https://sc.yuanda.biz/jingdian/User/usCenter.html'
+        max_retries = 5  # 最大重试次数
+        retry_count = 0
+
+        while retry_count < max_retries:
+            try:
+                self.driver.get(url)
+                wait = WebDriverWait(self.driver, 60)
+                balance_element = wait.until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'corg'))
+                )
+                balance_text = balance_element.text.replace('元', '').strip().replace(',', '')
+                return float(balance_text)
+
+            except Exception as e:
+                print(f"获取余额失败（第 {retry_count + 1} 次重试）: {e}")
+                retry_count += 1
+                self.driver.refresh()  # 刷新页面后重试
+
+        print("无法获取账户余额，请检查网络。")
+        return 0.0  # 返回默认值，防止后续逻辑出
 
     def init_balance_file(self,ctx):
         date = datetime.now() - timedelta(days=1)
