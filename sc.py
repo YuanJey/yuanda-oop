@@ -40,7 +40,7 @@ if __name__ == '__main__':
             print(f"日期格式错误: {date}，请使用 YYYY-MM-DD 格式。")
             exit(1)
         chrome_options = Options()
-        chrome_options.add_argument("--headless")  # 开启无头模式
+        # chrome_options.add_argument("--headless")  # 开启无头模式
         driver=webdriver.Chrome(chrome_options)
         user=User(driver,account,password)
         if user.login():
