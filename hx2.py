@@ -17,7 +17,7 @@ if __name__ == '__main__':
     driver.get("https://hx.yuanda.biz")
     input("请在浏览器中完成登陆操作后，按Enter继续...")
     order=Order()
-    order_files=order.get_order_files()
+    order_files=order.get_order_files(date)
     verification=Verification(driver)
     verification.set_cookie()
     while True:
