@@ -10,6 +10,16 @@ from user.user import User
 from selenium import webdriver
 import time
 
+
+def get_to_account(file_name):
+    with open(file_name, 'r', encoding='utf-8') as file:
+        key = ''
+        for line in file:
+            line = line.strip()
+            if not line:
+                continue  # 跳过空行
+            key = line
+    return key
 if __name__ == '__main__':
     auth=Auth()
     if auth.check2():
@@ -50,7 +60,9 @@ if __name__ == '__main__':
             buy=Buy(driver, num100, num200, num500, num1000, num2000)
             balance = user.get_balance()
             if balance>0:
-                transfer=Transfer(driver, "nuoshou780", "Knight123.")
+                to_account=get_to_account("transfer_account.txt")
+                to_password=get_to_account("transfer_password.txt")
+                transfer=Transfer(driver, to_account, to_password)
                 transfer.transfer(balance,  user.get_cookie())
             while True:
                 balance = user.get_balance()
