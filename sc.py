@@ -50,7 +50,7 @@ if __name__ == '__main__':
             print(f"日期格式错误: {date}，请使用 YYYY-MM-DD 格式。")
             exit(1)
         chrome_options = Options()
-        # chrome_options.add_argument("--headless")  # 开启无头模式
+        chrome_options.add_argument("--headless")  # 开启无头模式
         driver=webdriver.Chrome(chrome_options)
         user=User(driver,account,password)
         if user.login():
@@ -58,12 +58,12 @@ if __name__ == '__main__':
             user.download_order(date)
             user.save_balance_to_file("购买前余额")
             buy=Buy(driver, num100, num200, num500, num1000, num2000)
-            balance = user.get_balance()
-            if balance>0:
-                to_account=get_to_account("transfer_account.txt")
-                to_password=get_to_account("transfer_password.txt")
-                transfer=Transfer(driver, to_account, to_password)
-                transfer.transfer(balance,  user.get_cookie())
+            # balance = user.get_balance()
+            # if balance>0:
+            #     to_account=get_to_account("transfer_account.txt")
+            #     to_password=get_to_account("transfer_password.txt")
+            #     transfer=Transfer(driver, to_account, to_password)
+            #     transfer.transfer(balance,  user.get_cookie())
             while True:
                 balance = user.get_balance()
                 if buy.check_balance(balance):
