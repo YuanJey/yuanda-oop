@@ -1,5 +1,7 @@
 from selenium.webdriver.support.wait import WebDriverWait
 import requests
+
+from db.accounts import Database
 from order.order import Order
 from selenium import webdriver
 from concurrent.futures import ThreadPoolExecutor
@@ -111,18 +113,24 @@ if __name__ == '__main__':
                 for jd_account, jd_password in jd_orders_map.items():
                     verification.run_verification_for_pair(jd_account, jd_password)
         verification.save_success_summary()
-        balance_map = read_balance_file(date+'_购买前余额_balance.txt')
-        password = input("输入密码开始配资:")
-        if password:
-            transfer = Transfer(driver, password)
-            for account, balance in balance_map.items():
+        Db=Database("accounts.db")
+        accounts=Db.get_all_accounts()
+        # password = input("输入密码开始配资:")
+        hx_account=Db.get_hx_account()
+        if hx_account.account:
+            transfer = Transfer(driver, hx_account.password)
+            for account in accounts:
                 all_money = transfer.get_available_transfer_money()
-                if all_money > (30000 - balance):
-                    print(f"账户 {account} 可转账金额 {all_money} 大于等于配置金额 {30000 - balance}，即将开始执行。")
-                    # transfer.transfer(account, 30000-balance)
-                    transfer.transfer2(account, 30000 - balance)
+                if all_money > (30000 - account.balance):
+                    transfer.transfer2(account, 30000 - account.balance)
+                    all_money1 = transfer.get_available_transfer_money()
+                    if all_money1 ==all_money-(30000 - account.balance):
+                        print('转账到',account.account, '成功，转账金额：', 30000 - account.balance)
+                        Db.insert_account(account.account, 30000, 1)
+                    else:
+                        print(f"账户 {account} 可转账金额 {all_money1} 小于配置金额 {30000 - account.balance}，请手动充值。")
                 else:
-                    print(f"账户 {account} 可转账金额 {all_money} 小于配置金额 {30000 - balance}，请手动充值。")
+                    print(f"账户 {account} 可转账金额 {all_money} 小于配置金额 {30000 - account.balance}，请手动充值。")
         cont = input("是否再次核销（输入1继续，其他任意键退出）：")
         if cont == '1':
             continue

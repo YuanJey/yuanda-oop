@@ -3,6 +3,7 @@ import argparse
 from selenium.webdriver.chrome.options import Options
 from datetime import datetime
 
+import db.accounts
 from auth.auth import Auth
 from buy.buy import Buy
 from transfer.transfer import Transfer
@@ -49,6 +50,7 @@ if __name__ == '__main__':
         except ValueError:
             print(f"日期格式错误: {date}，请使用 YYYY-MM-DD 格式。")
             exit(1)
+        Db=db.db.Database('accounts.db')
         chrome_options = Options()
         chrome_options.add_argument("--headless")  # 开启无头模式
         driver=webdriver.Chrome(chrome_options)
@@ -57,13 +59,9 @@ if __name__ == '__main__':
             print(account,' 登录成功')
             user.download_order(date)
             user.save_balance_to_file("购买前余额")
+            b = user.get_balance()
+            Db.insert_account(account,b,False)
             buy=Buy(driver, num100, num200, num500, num1000, num2000)
-            # balance = user.get_balance()
-            # if balance>0:
-            #     to_account=get_to_account("transfer_account.txt")
-            #     to_password=get_to_account("transfer_password.txt")
-            #     transfer=Transfer(driver, to_account, to_password)
-            #     transfer.transfer(balance,  user.get_cookie())
             while True:
                 balance = user.get_balance()
                 if buy.check_balance(balance):
