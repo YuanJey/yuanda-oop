@@ -66,11 +66,11 @@ class Database:
         if row:
             return Account(*row)
         return None
-if __name__ == '__main__':
-    db = Database('accounts.db')
-    db.insert_account('test_account1', 100, False)
-    account=db.get_account('test_account1')
-    print(account.account)
-    db.insert_hx_account('test_account', 'test_password')
-    hx_account=db.get_hx_account()
-    print(hx_account.account)
+# if __name__ == '__main__':
+#     db = Database('accounts.db')
+#     db.insert_account('test_account1', 100, False)
+#     account=db.get_account('test_account1')
+#     print(account.account)
+#     db.insert_hx_account('test_account', 'test_password')
+#     hx_account=db.get_hx_account()
+#     print(hx_account.account)
