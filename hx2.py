@@ -89,6 +89,26 @@ def read_balance_file(file_path):
                 balance_map[key] = value
 
     return balance_map
+def login(driver,account, password):
+    # login_button = WebDriverWait(driver, 60).until(
+    #     EC.element_to_be_clickable((By.XPATH, '//button[@class="btn_login loginbox"]'))
+    # )
+    # login_button.click()
+    driver.get("https://hx.yuanda.biz/Home/Public/loginbox/type/2")
+    # 等待输入框出现并输入手机号,password
+    phone_input = WebDriverWait(driver, 60).until(
+        EC.presence_of_element_located((By.ID, "phone"))
+    )
+    phone_input.send_keys(account)
+    password_input = WebDriverWait(driver, 60).until(
+        EC.presence_of_element_located((By.ID, "password"))
+    )
+    password_input.send_keys(password)
+    login_button = WebDriverWait(driver, 60).until(
+        EC.element_to_be_clickable((By.ID, "login"))
+    )
+    login_button.click()
+    input("请在浏览器中完成登陆操作后，按Enter继续...")
 
 if __name__ == '__main__':
     date = input("请输入核销的订单日期(例如:2025-06-18)：")
@@ -100,45 +120,49 @@ if __name__ == '__main__':
         print(f"日期格式错误: {date}，请使用 YYYY-MM-DD 格式。")
         exit(1)
     driver = webdriver.Chrome()
+    # driver.get("https://hx.yuanda.biz")
+    # input("请在浏览器中完成登陆操作后，按Enter继续...")
+    Db = Database("accounts.db")
+    hx_account = Db.get_hx_account()
+    print(hx_account.account,hx_account.password,'登录中...')
+    login(driver,hx_account.account, hx_account.password)
     driver.get("https://hx.yuanda.biz")
-    input("请在浏览器中完成登陆操作后，按Enter继续...")
     order=Order()
     order_files=order.get_order_files(date)
     verification=Verification(driver)
     verification.set_cookie()
     while True:
-        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:  # 线程池统一管理
-            for order_file in order_files:
-                jd_orders_map=order.get_orders_from_file(order_file)
-                for jd_account, jd_password in jd_orders_map.items():
-                    verification.run_verification_for_pair(jd_account, jd_password)
-        verification.save_success_summary()
-        Db=Database("accounts.db")
+        order_files = order.get_order_files(date)
+        all_orders = []
+
+        for order_file in order_files:
+            all_orders.extend(order.get_orders_from_file(order_file).items())
+
+        with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            for jd_account, jd_password in all_orders:
+                executor.submit(verification.run_verification_for_pair, jd_account, jd_password)
+
         accounts=Db.get_all_accounts()
-        # password = input("输入密码开始配资:")
-        hx_account=Db.get_hx_account()
-        if hx_account.account:
+        if len(accounts) == 0:
+            print("没有可用的商城账户，请先添加账户。")
+            continue
+        else:
+            print("准备配资...")
             transfer = Transfer(driver, hx_account.password)
             for account in accounts:
+                print("商城账户：", account.account, "余额：", account.balance)
                 all_money = transfer.get_available_transfer_money()
-                if all_money > (30000 - account.balance):
-                    transfer.transfer2(account, 30000 - account.balance)
+                to_money=30000 - account.balance
+                if all_money > to_money:
+                    transfer.transfer2(account.account, to_money)
                     all_money1 = transfer.get_available_transfer_money()
-                    if all_money1 ==all_money-(30000 - account.balance):
-                        print('转账到',account.account, '成功，转账金额：', 30000 - account.balance)
-                        Db.insert_account(account.account, 30000, 1)
-                    else:
-                        print(f"账户 {account} 可转账金额 {all_money1} 小于配置金额 {30000 - account.balance}，请手动充值。")
+                    Db.insert_account(account.account, 30000, 1)
                 else:
-                    print(f"账户 {account} 可转账金额 {all_money} 小于配置金额 {30000 - account.balance}，请手动充值。")
+                    print(
+                        f"账户 {hx_account.account} 可转账金额 {all_money} 小于配置金额 {30000 - account.balance}，请手动充值。")
         cont = input("是否再次核销（输入1继续，其他任意键退出）：")
         if cont == '1':
             continue
         else:
             print("退出程序")
             break
-
-
-# if __name__ == '__main__':
-#     balance_map = read_balance_file('2025-06-17_购买前余额_balance.txt')
-#     print(balance_map)

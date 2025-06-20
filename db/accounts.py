@@ -1,5 +1,5 @@
 import sqlite3
-
+from datetime import datetime
 class Account:
     def __init__(self, account, balance, transfed):
         self.account = account
@@ -13,7 +13,10 @@ class HXAccount:
         self.password = password
 class Database:
     def __init__(self, db_file):
-        self.conn = sqlite3.connect(db_file)
+        current_date = datetime.now()
+        day = current_date.strftime("%Y-%m-%d")
+        self.conn = sqlite3.connect(day+"_"+db_file)
+        # self.conn = sqlite3.connect(db_file)
         self.cursor = self.conn.cursor()
         self.create_table()
 
@@ -33,7 +36,7 @@ class Database:
         ''')
         self.conn.commit()
     def get_all_accounts(self):
-        self.cursor.execute('SELECT * FROM accounts')
+        self.cursor.execute('SELECT * FROM accounts WHERE transfed = 0 ORDER BY account ASC')
         rows = self.cursor.fetchall()
         accounts = [Account(*row) for row in rows]
         return accounts
@@ -66,6 +69,12 @@ class Database:
         if row:
             return Account(*row)
         return None
+
+    def get_account_by_transfed(self, transfed):
+        self.cursor.execute('SELECT * FROM accounts WHERE transfed = ?  ORDER BY account ASC', (transfed,))
+        rows = self.cursor.fetchall()
+        accounts = [Account(*row) for row in rows]
+        return accounts
 # if __name__ == '__main__':
 #     db = Database('accounts.db')
 #     db.insert_account('test_account1', 100, False)
