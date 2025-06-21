@@ -11,11 +11,14 @@ class HXAccount:
         self.type = type
         self.account = account
         self.password = password
+class Key:
+    def __init__(self, key):
+        self.key = key
 class Database:
     def __init__(self, db_file):
         current_date = datetime.now()
         day = current_date.strftime("%Y-%m-%d")
-        self.conn = sqlite3.connect(day+"_"+db_file)
+        self.conn = sqlite3.connect("./db/"+day+"_"+db_file)
         # self.conn = sqlite3.connect(db_file)
         self.cursor = self.conn.cursor()
         self.create_table()
@@ -34,7 +37,25 @@ class Database:
                 account TEXT NOT NULL UNIQUE,
                 password TEXT)
         ''')
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS auth(
+                key TEXT PRIMARY KEY,
+                type INTEGER NOT NULL UNIQUE
+            )
+        ''')
         self.conn.commit()
+    def insert_key(self, key):
+        self.cursor.execute('''
+            INSERT OR REPLACE INTO auth (key, type)
+            VALUES (?, 1)
+        ''', (key,))
+        self.conn.commit()
+    def get_key(self):
+        self.cursor.execute('SELECT * FROM auth WHERE type = 1')
+        row = self.cursor.fetchone()
+        if row:
+            return Key(row[0])
+        return None
     def get_all_accounts(self):
         self.cursor.execute('SELECT * FROM accounts WHERE transfed = 0 ORDER BY account ASC')
         rows = self.cursor.fetchall()
