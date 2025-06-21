@@ -119,17 +119,17 @@ if __name__ == '__main__':
     except ValueError:
         print(f"日期格式错误: {date}，请使用 YYYY-MM-DD 格式。")
         exit(1)
-    driver = webdriver.Chrome()
+    hx_driver = webdriver.Chrome()
     # driver.get("https://hx.yuanda.biz")
     # input("请在浏览器中完成登陆操作后，按Enter继续...")
     Db = Database("accounts.db")
     hx_account = Db.get_hx_account()
     print(hx_account.account,hx_account.password,'登录中...')
-    login(driver,hx_account.account, hx_account.password)
-    driver.get("https://hx.yuanda.biz")
+    login(hx_driver, hx_account.account, hx_account.password)
+    hx_driver.get("https://hx.yuanda.biz")
     order=Order()
     order_files=order.get_order_files(date)
-    verification=Verification(driver)
+    verification=Verification(hx_driver)
     verification.set_cookie()
     while True:
         order_files = order.get_order_files(date)
@@ -148,7 +148,7 @@ if __name__ == '__main__':
             continue
         else:
             print("准备配资...")
-            transfer = Transfer(driver, hx_account.password)
+            transfer = Transfer(hx_driver, hx_account.password)
             for account in accounts:
                 print("商城账户：", account.account, "余额：", account.balance)
                 all_money = transfer.get_available_transfer_money()

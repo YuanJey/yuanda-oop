@@ -50,7 +50,7 @@ if __name__ == '__main__':
             exit(1)
         Db= Database('accounts.db')
         chrome_options = Options()
-        chrome_options.add_argument("--headless")  # 开启无头模式
+        # chrome_options.add_argument("--headless")  # 开启无头模式
         driver=webdriver.Chrome(chrome_options)
         user=User(driver,account,password)
         if user.login():
